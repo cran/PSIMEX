@@ -1,0 +1,139 @@
+\documentclass{article}[11pt]
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{PSIMEX}
+
+
+
+\title{PSIMEX: Simex algorithm for errors on pedigree structures} 
+\author{Erica Ponzi}
+\begin{document}
+
+
+\maketitle
+ <<custom, echo = FALSE, results ='hide', message = FALSE, warning = FALSE>>=
+ #library(knitr)
+# opts_chunk$set(
+#fig.path='plots/p', echo = FALSE, results='hide', cache=TRUE
+#)
+          library("PSIMEX")
+          data(pedigree)
+          data(data)
+          initial <- PSIMEX:::initial 
+          initial_herit <- PSIMEX:::initial_herit
+          extrapolation <- PSIMEX:::extrapolation
+          fit.nls <- PSIMEX:::fit.nls
+          plot.Psimex <- PSIMEX:::plot.Psimex
+          plot.simul.Psimex <- PSIMEX:::plot.simul.Psimex
+          Psimex <- PSIMEX:::Psimex
+          simul.na <- PSIMEX:::simul.na
+          simul.na.top <- PSIMEX:::simul.na.top
+          simul.na.bottom <- PSIMEX:::simul.na.bottom
+          simul.na.uni <- PSIMEX:::simul.na.uni
+          simul.na.top.herit <- PSIMEX:::simul.na.top.herit
+          simul.na.bottom.herit <- PSIMEX:::simul.na.bottom.herit
+          simul.na.uni.herit <- PSIMEX:::simul.na.uni.herit
+          simul.replace <- PSIMEX:::simul.replace
+          simul.replace.uni <- PSIMEX:::simul.replace.uni
+          simul.replace.similar <- PSIMEX:::simul.replace.similar
+          simul.replace.uni.herit <- PSIMEX:::simul.replace.uni.herit
+          simul.replace.similar.herit <- PSIMEX:::simul.replace.similar.herit
+ 
+          cairo.ps <- grDevices:::cairo_ps
+          dev.off <- grDevices:::dev.off
+          
+@
+ <<plotsetup = 'hide', echo = FALSE>>=
+mycairo <- function(name, width, height, ...) {
+    cat("using cairo")
+    grDevices::cairo.ps(file = paste(name, "eps", sep = "."),
+                           width = width, height = height)
+}
+mycairo.off <- function() {
+    cat("shutting down cairo\n")
+    grDevices::dev.off()
+}
+@
+<<PS-setup, echo = FALSE, results ='hide', message = FALSE, warning = FALSE>>=
+options(width=50)
+         
+pkgs <- c("PSIMEX", "MCMCglmm", "plotrix", "pedigree", "psych", "AICcmodavg")
+          stopifnot(all(sapply(pkgs, require, character.only = TRUE)))
+          
+set.seed(29)
+@
+\section{Introduction}
+Pedigree SIMEX (P-SIMEX) is a generalization of the SIMEX algorithm used to correct for measurement error in regression models. P-SIMEX applies to error in the pedigree structures, which can affect different estimates in quantitative genetics, as for example inbreeding regression or heritability. 
+The algorithm starts from a given initial pedigree error and calculates the error-prone estimate starting from it. It then simulates progressively increasing errors into the pedigree and calculates the estimate for each of them. By repeating this procedure for a given number of simulations for each error level, it computes the average across simulations and calculates a value for the estimate for each error level. 
+These values are used to fit a function of the estimates in terms of the error proportion in the pedigree and a correct value is extrapolated for the null error rate. 
+Error-free values are given together with their standard errors. The fitting function can be chosen among linear and quadratic by the user. \newline
+Here we apply P-SIMEX to the calculation of inbreeding depression and heritability. The error structures modelled by P-SIMEX are the missing paternities across the pedigree and the misassignment of paternities, that is the presence of wrong relationships among individuals in the examined population. 
+The pedigree information are contained in the file 'pedigree', where for each individual the ids of its father and mother are reported, as well its sex and generation number. \newline
+<<pedigreedata, echo = TRUE, results ='markup', message = FALSE, warning = FALSE>>=
+ pedigree0 <- pedigree
+ head(pedigree0)
+@
+The trait data are reported in the file 'data', where we have information about the covariates included in the model we want to use for the estimation of the parameter of interest. The trait is reported here as 'y'. Any name for the trait is admitted provided coherence is kept in the model specification. In the MCMCglmm case, we recommend not to use the name 'trait', since it can cause some inconsistencies with the package internal functions.
+
+<<data, echo = TRUE, results ='markup', message = FALSE, warning = FALSE>>=
+
+ head(data)
+@
+In case we use a MCMCglmm for the calculation of heritability and we include repeated measurement in it, we need to include in this dataset a copy of the variable 'id' and call it 'animal', as requested by the package 'MCMCglmm'. When the parameter of interest is the inbreeding depression, we can already include the inbreeding coefficient in the dataset or the algorithm will anyway calculate it from the pedigree data and include it in the model covariates. 
+
+
+ \section{P-SIMEX on misassigned paternities}
+In this section we will see how to use PSIMEX in the calculation of a parameter of interest when the pedigree is affected by misassignment of paternities. We can model this case by simulating wrong paternities uniformly across the whole pedigree or by replacing true fathers with similar individuals and we can apply this either to the calculation of inbreeding depression or to the heritability. The main function we will use is \textbf{Psimex} and the specification of its parameters will allow us to model each different case. 
+\subsection{Uniform replacement}
+In this case, the error is simulated by replacing fathers with random male individuals taken from the same generations.
+\subsubsection{Inbreeding depression}
+<<replinb, echo = TRUE, results ='markup', message = FALSE, warning = FALSE>>=
+lambda <- c(0.2, 0.3, 0.4, 0.5, 0.6)
+lambda0 <- 0.1
+model <- lm(y~sex+f_inb, data = data)
+ 
+results_mis <- Psimex(pedigree0, data, 
+                  lambda, lambda0, B = 10, 
+                  model, parameter = "inbreeding", 
+                  error = "misassignment", way = "uniform", 
+                  fitting.method = c("linear", "quadratic"), 
+                  ntop = NA, nbottom = NA, 
+                  prior, nitt, thin, burnin)
+ results_mis$description
+ results_mis$error
+ results_mis$fitting.method
+ results_mis$way
+ 
+ results_mis$extrapolated_data 
+ results_mis$lambda
+ results_mis$lambda0 
+ results_mis$starting.value
+ @
+
+\subsection{Replacement with similar individuals}
+In this case, the error is simulated by replacing fathers with the most similar male individuals taken from the same generations.
+\subsubsection{Inbreeding depression}
+<<replinbs, echo = TRUE, results ='markup', message = FALSE, warning = FALSE>>=
+lambda <- c(0.2, 0.3, 0.4, 0.5, 0.6)
+lambda0 <- 0.1
+model <- lm(y~sex+f_inb, data = data)
+ 
+results_mis1 <- Psimex(pedigree0, data, 
+                  lambda, lambda0, B = 10, 
+                  model, parameter = "inbreeding", 
+                  error = "misassignment", way = "similar", 
+                  fitting.method = c("quadratic", "cubic"), 
+                  ntop = NA, nbottom = NA, 
+                  prior, nitt, thin, burnin)
+ results_mis1$description
+ results_mis1$error
+ results_mis1$fitting.method
+ results_mis1$way
+ 
+ results_mis1$extrapolated_data 
+ results_mis1$lambda
+ results_mis1$lambda0 
+ results_mis1$starting.value
+ @
+All the described cases can be applied to the calculation of heritability as well. One will need to use a model specification as the one we illustrated in the first section and specify all parameters according to each specific case, as we did in the estimation of inbreeding depression.
+PSIMEX also allows to simulate missing paternities instead of misassigned paternities. This can be done by setting the 'error' parameter to 'missing', and can be applied to each case and parameter. 
+\end{document}

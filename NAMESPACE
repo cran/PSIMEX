@@ -1,0 +1,11 @@
+export(Psimex)
+import(MCMCglmm)
+import(plotrix)
+import(pedigree)
+import(knitr)
+
+importFrom("graphics", "legend", "plot", "points")
+importFrom("graphics", "lines")
+importFrom("stats", "glm", "lm", "median", "na.omit", "nls","predict", "sd", "update", "var", "AIC")
+
+
