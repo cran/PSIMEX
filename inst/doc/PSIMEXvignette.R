@@ -1,3 +1,4 @@
+## R code for the vignette of PSIMEX
 ## ----custom, echo = FALSE, results ='hide', message = FALSE, warning = FALSE----
 #library(knitr)
 # opts_chunk$set(

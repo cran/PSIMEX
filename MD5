@@ -1,4 +1,4 @@
-19b5e737311e9dd09657db7a0209b166 *DESCRIPTION
+ec2f90c5494d393dba8cb51f7c5e818e *DESCRIPTION
 55a2ee4b58fec0d4ce78b0002bbb4bd8 *NAMESPACE
 bf8cf00e52c8f6e61afaddc050caafc3 *R/Psimex.R
 a6cd9adec64232bbefec88b0715c1499 *R/extrapolation.R
@@ -19,13 +19,13 @@ fc1c2748c49617f95b5e7290f778fa9d *R/simul.replace.R
 c99edda5e90f88e14d6470dec35b8b45 *R/simul.replace.similar.herit.R
 aa58d76c7f27790f4bcea8fd00d0661f *R/simul.replace.uni.R
 c3dfa493cf09830480b0dee3d21178a9 *R/simul.replace.uni.herit.R
-f5c1cf50d2b66d2466514548cd8537a6 *build/partial.rdb
-23e5c43a4d13eecec1100f87eeee2eb8 *build/vignette.rds
+72acc9739b56948c9daabf561d02fea0 *build/partial.rdb
+3a8275659575cee4330728f7dafdac9c *build/vignette.rds
 a34d71704be604d53feaac55f44541c1 *data/data.txt.gz
 cbc48d9bdf97f65bbf0c7070df00c316 *data/pedigree.txt.gz
-9894ad40baab4d7f37faecc7a99c9f9d *inst/doc/PSIMEXvignette.R
-3cf515c603f1ccb5739e63d9cb628fa6 *inst/doc/PSIMEXvignette.Rnw
-2d944e086e8576ead35177bb5f325872 *inst/doc/PSIMEXvignette.pdf
+521ddc38465cfc114e5f6f69f1670c8b *inst/doc/PSIMEXvignette.R
+bf523f09863915e47931331ee0d61ea2 *inst/doc/PSIMEXvignette.Rnw
+cb802dc13bfb8f1362ee9180fccb1e70 *inst/doc/PSIMEXvignette.pdf
 5c56bdd3a9a81078a61da667ca250d2e *man/PSIMEX-package.Rd
 acd138774a51887d3feb4c371b26e300 *man/Psimex.Rd
 8d7e5568d24a0084b6544ebde45d7210 *man/data.Rd
@@ -48,6 +48,6 @@ ef9d163c172f617ac4078c6af0414c41 *man/simul.replace.Rd
 dc8ea2dfef7799619cfcc72e4a632976 *man/simul.replace.similar.herit.Rd
 c1c8f3e3e019497cd72a310b98f0d7b6 *man/simul.replace.uni.Rd
 0aa163808fbc742d92796886c7622530 *man/simul.replace.uni.herit.Rd
-3cf515c603f1ccb5739e63d9cb628fa6 *vignettes/PSIMEXvignette.Rnw
+bf523f09863915e47931331ee0d61ea2 *vignettes/PSIMEXvignette.Rnw
 649b8559aa4b5ef397c103c11591ee05 *vignettes/data.txt
 9a319d423cdbb9f5afc894fc12252079 *vignettes/pedigree.txt

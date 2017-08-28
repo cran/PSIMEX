@@ -1,4 +1,5 @@
 \documentclass{article}[11pt]
+%\VignetteDepends{PSIMEX, psych, AICcmodavg}
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{PSIMEX}
 
